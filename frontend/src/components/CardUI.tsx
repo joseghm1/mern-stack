@@ -4,8 +4,7 @@ function CardUI() {
   let _ud = localStorage.getItem('user_data');
   let ud = _ud ? JSON.parse(_ud) : null;
   let userId: string = ud?.id || '';
-  let firstName: string = ud?.firstName || '';
-  let lastName: string = ud?.lastName || '';
+
 
   const [message, setMessage] = React.useState<string>('');
   const [searchResults, setResults] = React.useState<string>('');
