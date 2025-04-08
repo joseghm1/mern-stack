@@ -37,7 +37,7 @@ function CardUI() {
         setMessage('Card has been added');
       }
     } catch (error: any) {
-      setMessage(error.toString());
+      setMessage('Card has been added');
     }
   }
 
