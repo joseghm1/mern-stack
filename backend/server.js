@@ -7,7 +7,8 @@ const jwt = require('jsonwebtoken');
 const { MongoClient } = require('mongodb');
 
 const app = express();
-const client = new MongoClient(process.env.MONGO_URI);
+const url = 'mongodb+srv://joseghm:J*maria200@cop4331.2zyjohl.mongodb.net/COP4331?retryWrites=true&w=majority&appName=COP4331';
+const client = new MongoClient(url);
 const PORT = process.env.PORT || 5001;
 const jwtSecret = process.env.JWT_SECRET;
 
