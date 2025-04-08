@@ -20,7 +20,7 @@ function Login() {
         const js = JSON.stringify(obj);
 
         try {
-            const response = await fetch('http://localhost:5001/api/login', {
+            const response = await fetch('https://mern-stack-backend-9gvk.onrender.com/api/login', {
                 method: 'POST',
                 body: js,
                 headers: { 'Content-Type': 'application/json' },

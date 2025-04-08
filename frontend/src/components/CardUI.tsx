@@ -26,7 +26,7 @@ function CardUI() {
     let obj = { UserID: userId, Card: card };
     let js = JSON.stringify(obj);
     try {
-      const response = await fetch('http://localhost:5001/api/addcard', {
+      const response = await fetch('https://mern-stack-backend-9gvk.onrender.com/api/addcard', {
         method: 'POST',
         body: js,
         headers: { 'Content-Type': 'application/json' },
@@ -47,7 +47,7 @@ function CardUI() {
     let obj = { UserID: userId, search: search };
     let js = JSON.stringify(obj);
     try {
-      const response = await fetch('http://localhost:5001/api/searchcards', {
+      const response = await fetch('https://mern-stack-backend-9gvk.onrender.com/api/searchcards', {
         method: 'POST',
         body: js,
         headers: { 'Content-Type': 'application/json' },
