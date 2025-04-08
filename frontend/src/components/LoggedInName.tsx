@@ -1,7 +1,7 @@
 function LoggedInName() {
     const _ud = localStorage.getItem('user_data');
     const ud = _ud ? JSON.parse(_ud) : { id: '', firstName: '', lastName: '' };
-    const { id: firstName, lastName } = ud;
+    const { firstName, lastName } = ud;
 
     const doLogout = (event: React.MouseEvent<HTMLButtonElement>): void => {
         event.preventDefault();
