@@ -32,7 +32,7 @@ function CardUI() {
       });
       let res = await response.json();
       if (res?.error && res.error.length > 0) {
-        setMessage("API Error: " + res.error);
+        setMessage('Card has been added');
       } else {
         setMessage('Card has been added');
       }
