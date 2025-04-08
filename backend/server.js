@@ -16,74 +16,78 @@ const jwtSecret = process.env.JWT_SECRET;
 app.use(cors());
 app.use(bodyParser.json());
 
-// JWT Verification Middleware
-function verifyToken(req, res, next) {
-    const token = req.headers['authorization'];
-    if (!token) return res.status(401).json({ error: 'No token provided' });
 
-    try {
-        const decoded = jwt.verify(token, jwtSecret);
-        req.user = decoded;
-        next();
-    } catch (err) {
-        return res.status(403).json({ error: 'Failed to authenticate token' });
-    }
-}
+
+
 
 // Routes
-app.post('/api/login', async (req, res) => {
-    const { Login, Password } = req.body;
-
-    try {
-        const db = client.db('COP4331');
-        const user = await db.collection('Users').findOne({ Login, Password });
-
-        if (!user) return res.status(400).json({ error: 'Invalid login or password' });
-
-        // Create and sign token
-        const payload = {
-            id: user.UserID,
-            FirstName: user.FirstName,
-            LastName: user.LastName,
-        };
-
-        const token = jwt.sign(payload, jwtSecret, { expiresIn: '2h' });
-
-        res.status(200).json({ token, ...payload, error: '' });
-    } catch (err) {
-        res.status(500).json({ error: 'Database error: ' + err.message });
-    }
-});
-
-app.post('/api/addcard', verifyToken, async (req, res) => {
-    const { Card } = req.body;
-    const newCard = { UserID: req.user.id, Card };
+app.post('/api/addcard', async (req, res, next) => {
+    const { UserID, Card } = req.body;
+    const newCard = { UserID, Card };
+    let error = '';
 
     try {
         const db = client.db('COP4331');
         await db.collection('Cards').insertOne(newCard);
-        res.status(200).json({ error: '' });
+        cardList.push(Card);
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        error = e.toString();
     }
+
+    res.status(200).json({ error });
 });
 
-app.post('/api/searchcards', verifyToken, async (req, res) => {
-    const { search } = req.body;
+app.post('/api/login', async (req, res, next) => {
+    let error = '';
+    const { Login, Password } = req.body;
+
+    let id = '-1';
+    let FirstName = '';
+    let LastName = '';
+
+    if (!Login || !Password || Login.trim() === '' || Password.trim() === '') {
+        error = 'Login and password are required';
+    } else {
+        try {
+            const db = client.db('COP4331');
+            console.log('Querying Users collection with:', { Login, Password });
+            const user = await db.collection('Users').findOne({ Login, Password }); // Changed to 'Users'
+            console.log('Found user:', user);
+
+            if (user) {
+                id = user.UserID;
+                FirstName = user.FirstName;
+                LastName = user.LastName;
+            } else {
+                error = 'Invalid login or password';
+            }
+        } catch (e) {
+            error = 'Database error: ' + e.message;
+            console.error('Database error:', e);
+        }
+    }
+
+    res.status(200).json({ id, FirstName, LastName, error });
+});
+
+app.post('/api/searchcards', async (req, res, next) => {
+    const { UserID, search } = req.body;
+    let error = '';
     const _search = search.trim();
 
     try {
         const db = client.db('COP4331');
         const results = await db.collection('Cards')
-            .find({ UserID: req.user.id, Card: { $regex: _search + '.*' } })
+            .find({ UserID, Card: { $regex: _search + '.*' } })
             .toArray();
-
-        const cards = results.map(r => r.Card);
-        res.status(200).json({ results: cards, error: '' });
+        const _ret = results.map(result => result.Card);
+        res.status(200).json({ results: _ret, error });
     } catch (e) {
-        res.status(500).json({ results: [], error: e.message });
+        error = e.toString();
+        res.status(200).json({ results: [], error });
     }
 });
+
 
 // Connect to DB & Start Server
 async function startServer() {
